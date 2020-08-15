@@ -30,7 +30,6 @@ type Server struct {
 type Process struct {
 	Processes []string `json:"processes"`
 	Whitelist []string `json:"whitelist"`
-	DNS       string   `json:"dns"`
 }
 
 var server *Server
