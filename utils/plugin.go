@@ -2,7 +2,7 @@ package utils
 
 import (
 	"fmt"
-	"github.com/MissGod1/go-tun2socks/common/log"
+	"github.com/MissGod1/PProxy/common/log"
 	"net"
 	"os"
 	"os/exec"

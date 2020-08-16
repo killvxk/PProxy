@@ -5,10 +5,12 @@ import (
 	"flag"
 	"github.com/MissGod1/PProxy/common/dns"
 	"github.com/MissGod1/PProxy/common/dns/fakedns"
-	"github.com/MissGod1/go-tun2socks/common/log"
+	"github.com/MissGod1/PProxy/common/log"
+	_ "github.com/MissGod1/PProxy/common/log/simple"
 	"io/ioutil"
 	"os"
 	"os/signal"
+	"strings"
 	"syscall"
 
 	"github.com/MissGod1/PProxy/utils"
@@ -73,13 +75,27 @@ func GetProcess(file string) *Process {
 func main() {
 	sconfig := flag.String("sconfig", "", "server configure file")
 	pconfig := flag.String("pconfig", "", "process configure file")
+	logLevel := flag.String("log", "info", "log level")
 
 	flag.Parse()
 	if *sconfig == "" || *pconfig == "" {
 		flag.Usage()
 		os.Exit(1)
 	}
-	log.SetLevel(log.INFO)
+	switch strings.ToLower(*logLevel) {
+	case "info":
+		log.SetLevel(log.INFO)
+	case "debug":
+		log.SetLevel(log.DEBUG)
+	case "warn":
+		log.SetLevel(log.WARN)
+	case "none":
+		log.SetLevel(log.NONE)
+	case "error":
+		log.SetLevel(log.ERROR)
+	default:
+		log.SetLevel(log.INFO)
+	}
 	fakeDns = fakedns.NewSimpleFakeDns()
 
 	server = GetServer(*sconfig)
@@ -99,5 +115,5 @@ func main() {
 	if plugin != nil {
 		plugin.KillPlugin()
 	}
-	//app.Close()
+	app.Close()
 }

@@ -2,9 +2,9 @@ package main
 
 import (
 	"fmt"
+	"github.com/MissGod1/PProxy/common/log"
 	"github.com/MissGod1/PProxy/proxy/shadowsocks"
 	"github.com/MissGod1/PProxy/utils"
-	"github.com/MissGod1/go-tun2socks/common/log"
 	"github.com/MissGod1/go-tun2socks/core"
 )
 

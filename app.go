@@ -2,12 +2,14 @@ package main
 
 import (
 	"fmt"
+	"github.com/MissGod1/PProxy/common/log"
 	"github.com/MissGod1/go-tun2socks/core"
 	"github.com/google/gopacket/layers"
 	"sync"
 
-	"github.com/google/gopacket"
 	"github.com/MissGod1/PProxy/windivert"
+	"github.com/MissGod1/PProxy/utils"
+	"github.com/google/gopacket"
 	shadow "github.com/imgk/shadow/utils"
 )
 
@@ -30,7 +32,7 @@ const (
 )
 
 func NewApp(_server *Server, _process *Process) *App {
-	iface, subiface, err := windivert.GetInterfaceIndex()
+	iface, subiface, err := utils.GetInterfaceIndex(_server.Server)
 	h1, err := windivert.Open(Filter1, windivert.LayerSocket, 100, windivert.FlagSniff | windivert.FlagRecvOnly)
 	if err != nil {
 		panic("Open Socket Handle Failed.")
@@ -108,15 +110,15 @@ func (a *App) filter1()  {
 			if v {
 				// TODO: 列表中
 				session := ConvertToSession(address)
-				fmt.Println("Socket Layer:", session)
+				log.Debugf("Socket Layer: %v", session)
 				a.sessions.LoadOrStore(session, true)
 			}
 		} else if pName, _ := shadow.QueryName(address.Socket().ProcessID); pName != "" {
-			//fmt.Println("Program:", pName)
+			log.Debugf("Program: %v", pName)
 			if _, ok := a.processes[pName]; ok {
 				a.pids[address.Socket().ProcessID]= true
 				session := ConvertToSession(address)
-				fmt.Println("Socket Layer:", session)
+				log.Debugf("Socket Layer: %v", session)
 				a.sessions.LoadOrStore(session, true)
 				// TODO: 处理session
 			} else {
@@ -153,7 +155,7 @@ func (a *App) filter2()  {
 			if session != "" {
 				//fmt.Println("Network Layer : ", session)
 				if _, ok := a.sessions.Load(session); ok {
-					fmt.Println("Network Layer : ", session)
+					log.Debugf("Network Layer : %v", session)
 					a.lwip.Write(buffer)
 					continue
 				} else if dnsLayer := packet.Layer(layers.LayerTypeDNS); dnsLayer != nil {
@@ -161,7 +163,7 @@ func (a *App) filter2()  {
 					domain := string(dns.Questions[0].Name)
 					//fmt.Println("Domain : ", domain)
 					if _, ok := a.whitelist[domain]; ok {
-						fmt.Println("Domain : ", domain, "=>", ip.DstIP)
+						log.Debugf("Domain : %v => %v", domain, ip.DstIP)
 						a.lwip.Write(buffer)
 						continue
 					}

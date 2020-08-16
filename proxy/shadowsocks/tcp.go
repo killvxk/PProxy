@@ -11,7 +11,7 @@ import (
 	sscore "github.com/shadowsocks/go-shadowsocks2/core"
 	sssocks "github.com/shadowsocks/go-shadowsocks2/socks"
 
-	"github.com/MissGod1/go-tun2socks/common/log"
+	"github.com/MissGod1/PProxy/common/log"
 	"github.com/MissGod1/go-tun2socks/core"
 )
 
