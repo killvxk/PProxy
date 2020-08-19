@@ -1,8 +1,8 @@
-package utils
+package common
 
 import (
 	"fmt"
-	"github.com/MissGod1/PProxy/common/log"
+	"github.com/eycorsican/go-tun2socks/common/log"
 	"net"
 	"os"
 	"os/exec"

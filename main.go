@@ -5,15 +5,16 @@ import (
 	"flag"
 	"github.com/MissGod1/PProxy/common/dns"
 	"github.com/MissGod1/PProxy/common/dns/fakedns"
-	"github.com/MissGod1/PProxy/common/log"
-	_ "github.com/MissGod1/PProxy/common/log/simple"
+	"github.com/eycorsican/go-tun2socks/common/log"
+	_ "github.com/eycorsican/go-tun2socks/common/log/simple"
+	"github.com/eycorsican/go-tun2socks/core"
 	"io/ioutil"
 	"os"
 	"os/signal"
 	"strings"
 	"syscall"
 
-	"github.com/MissGod1/PProxy/utils"
+	"github.com/MissGod1/PProxy/common"
 )
 
 // 服务配置
@@ -36,7 +37,7 @@ type Process struct {
 
 var server *Server
 var process *Process
-var plugin *utils.Plugin
+var plugin *common.Plugin
 var fakeDns dns.FakeDns
 
 var createrhandler = make(map[string]func())
@@ -96,18 +97,22 @@ func main() {
 	default:
 		log.SetLevel(log.INFO)
 	}
-	fakeDns = fakedns.NewSimpleFakeDns()
 
 	server = GetServer(*sconfig)
 	process = GetProcess(*pconfig)
-
+	fakeDns = fakedns.NewSimpleFakeDns()
 	if creater, found := createrhandler[server.Type]; found {
 		creater()
 	} else {
 		panic("Unsupported proxy type.")
 	}
-	app := NewApp(server, process)
-	app.Run()
+	app, err := NewApp(server, process)
+	if err != nil {
+		panic("App Run Failed.")
+	}
+	core.RegisterOutputFn(app.Write)
+	lwip := core.NewLWIPStack()
+	_, _ = app.WriteTo(lwip)
 
 	sigCh := make(chan os.Signal, 1)
 	signal.Notify(sigCh, syscall.SIGINT, syscall.SIGTERM)

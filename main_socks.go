@@ -2,10 +2,11 @@ package main
 
 import (
 	"fmt"
-	"github.com/MissGod1/PProxy/common/log"
 	"github.com/MissGod1/PProxy/proxy/socks"
-	"github.com/MissGod1/go-tun2socks/core"
+	"github.com/eycorsican/go-tun2socks/common/log"
+	"github.com/eycorsican/go-tun2socks/core"
 	"net"
+	"time"
 )
 
 func init()  {
@@ -19,6 +20,6 @@ func init()  {
 		//proxyPort := uint16(proxyAddr.Port)
 
 		core.RegisterTCPConnHandler(socks.NewTCPHandler(server.Server, server.ServerPort, fakeDns))
-		core.RegisterUDPConnHandler(socks.NewUDPHandler(server.Server, server.ServerPort, 10, fakeDns))
+		core.RegisterUDPConnHandler(socks.NewUDPHandler(server.Server, server.ServerPort, 1*time.Second, fakeDns))
 	})
 }

@@ -10,8 +10,8 @@ import (
 	"github.com/miekg/dns"
 
 	cdns "github.com/MissGod1/PProxy/common/dns"
-	"github.com/MissGod1/PProxy/common/log"
-	"github.com/MissGod1/go-tun2socks/core"
+	"github.com/eycorsican/go-tun2socks/common/log"
+	"github.com/eycorsican/go-tun2socks/core"
 )
 
 const (
@@ -26,7 +26,7 @@ type simpleFakeDns struct {
 
 	// TODO cleanup map
 	ip2domain map[uint32]string
-	domainCache map[string]net.IP
+	domain2ip map[string]net.IP
 
 	// Cursor is an IPv4 address represent in uint32 type.
 	cursor    uint32
@@ -77,7 +77,7 @@ func ip2uint32(ip net.IP) uint32 {
 func NewSimpleFakeDns() cdns.FakeDns {
 	return &simpleFakeDns{
 		ip2domain: make(map[uint32]string, 64),
-		domainCache: make(map[string]net.IP, 64),
+		domain2ip: make(map[string]net.IP, 64),
 		cursor:    MinFakeIPCursor,
 	}
 }
@@ -85,12 +85,12 @@ func NewSimpleFakeDns() cdns.FakeDns {
 func (f *simpleFakeDns) allocateIP(domain string) net.IP {
 	f.Lock()
 	defer f.Unlock()
-	if ip, ok := f.domainCache[domain]; ok {
+	if ip, found := f.domain2ip[domain]; found {
 		return ip
 	}
 	f.ip2domain[f.cursor] = domain
 	ip := uint322ip(f.cursor)
-	f.domainCache[domain] = ip
+	f.domain2ip[domain] = ip
 	f.cursor += 1
 	if f.cursor > MaxFakeIPCursor {
 		f.cursor = MinFakeIPCursor
