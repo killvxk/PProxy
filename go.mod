@@ -8,5 +8,6 @@ require (
 	github.com/imgk/shadow v0.0.0-20200807110908-5ffdc22106cb
 	github.com/miekg/dns v1.1.31
 	github.com/pmezard/adblock v0.0.0-20171028110701-edfb97ad89cd
+	github.com/shadowsocks/go-shadowsocks2 v0.1.3
 	golang.org/x/net v0.0.0-20200707034311-ab3426394381
 )
