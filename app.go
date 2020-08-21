@@ -84,12 +84,12 @@ func NewApp(_server *Server, _process *Process) (*App, error) {
 	}
 
 	matcher := adblock.NewMatcher()
-	for i, r := range _process.Whitelist {
+	for _, r := range _process.Whitelist {
 		rule, err := adblock.ParseRule(r)
 		if err != nil {
 			continue
 		}
-		matcher.AddRule(rule, i)
+		matcher.AddRule(rule, 0)
 	}
 
 	r, w := io.Pipe()
